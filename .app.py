@@ -234,3 +234,27 @@ else:
     # 日志
     with st.expander("📜 冒险日志", expanded=True):
         for log in st.session_state.logs[::-1]: st.write(log)
+# --- 找到 move 函数，在里面添加安全判定 ---
+def move(dire, steps=1):
+    # 保险 1：如果 items 消失了，立刻补上
+    if "items" not in st.session_state or st.session_state.items is None:
+        st.session_state.items = []
+        
+    old_pos = list(st.session_state.pos)
+    for _ in range(steps):
+        nx, ny = st.session_state.pos
+        if dire == 'w': ny -= 1
+        elif dire == 's': ny += 1
+        elif dire == 'a': nx -= 1
+        elif dire == 'd': nx += 1
+        
+        if 1 <= nx <= 13 and 1 <= ny <= 6:
+            st.session_state.pos = [nx, ny]
+        else: break
+        
+    # 拾取逻辑
+    for i in st.session_state.items[:]:
+        if i["pos"] == st.session_state.pos:
+            st.session_state.gold += 50
+            add_log("💰 获得金币 +50")
+            st.session_state.items.remove(i)
